@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const db = require("./db");
 
@@ -14,10 +15,10 @@ app.post("/addSchool", (req, res) => {
     }
 
     //------------------------simple validation-----------------------------
-    if (!name ||!address ||!latitude ||!longitude) {
+    if (!name || !address || !latitude || !longitude) {
         return res.status(400).json({
-            message: "Please provide name, address, latitude and longitude"
-        })
+            message: "Please provide name, address, latitude and longitude",
+        });
     }
     const sql =
         "INSERT INTO schools(name,address,latitude,longitude) VALUES(?,?,?,?)";
@@ -26,13 +27,13 @@ app.post("/addSchool", (req, res) => {
         if (err) {
             console.log("Error inserting school:", err);
             return res.status(500).json({
-                message: "Database error while adding school"
+                message: "Database error while adding school",
             });
         }
 
-        res.json({ 
+        res.json({
             message: "School added successfully",
-            id: result.insertId
+            id: result.insertId,
         });
     });
 });
@@ -40,34 +41,30 @@ app.post("/addSchool", (req, res) => {
 /* -------------------------- LIST SCHOOLS API -----------------------*/
 
 app.get("/listSchools", (req, res) => {
-
     //-----------------user location (default = Hyderabad)-----------------
-    const latitude = req.query.latitude || 17.3850;
+    const latitude = req.query.latitude || 17.385;
     const longitude = req.query.longitude || 78.4867;
-
 
     const sql = "SELECT * FROM schools";
 
     db.query(sql, (err, results) => {
-        
         if (err) {
             console.error("Error fetching schools:", err);
             return res.status(500).json({
-                message: "Database error while fetching schools"
+                message: "Database error while fetching schools",
             });
         }
 
         //--------------calculate distance from user location----------------------
         const schools = results.map((school) => {
-            
             const distance = Math.sqrt(
                 Math.pow(latitude - school.latitude, 2) +
                 Math.pow(longitude - school.longitude, 2),
             );
 
-            return { 
+            return {
                 ...school,
-                distance
+                distance,
             };
         });
 
